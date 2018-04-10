@@ -87,6 +87,22 @@ public final class Calculator {
                     break;
                 }
             }
+            else if (currentElement.equals("sqrt")){
+                //if it's a "sqrt"
+                try{
+                    if(Calculator.stack.size()>=1){
+                        //check if there's sufficient number for the operator
+                        sqrt();
+                    }
+                    else{
+                        throw new insufficientNumberException();
+                    }
+                }
+                catch (insufficientNumberException ex){
+                    result.append("operator sqrt (position:"+ index + " ): insufficient parameters \n");
+                    break;
+                }
+            }
             else{
                 //other unknow char
                 for(int m=0;m<index-1;m++){
@@ -131,6 +147,11 @@ public final class Calculator {
         Double value1 = Calculator.stack.pop();
         Double value2 = Calculator.stack.pop();
         Calculator.stack.push(value2 / value1);
+    }
+
+    private static void sqrt(){
+        Double value1 = Calculator.stack.pop();
+        Calculator.stack.push(Math.sqrt(value1));
     }
 
 
