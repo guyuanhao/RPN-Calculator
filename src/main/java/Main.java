@@ -11,7 +11,7 @@ public class Main {
                 break;
             }
             result =  Calculator.calculate(str);
-            System.out.println("Stack:" + result);
+            System.out.println(result);
         }
         System.out.println("bye...");
     }
