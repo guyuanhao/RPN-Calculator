@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public final class Calculator {
 
     private static Stack<Double> stack = new Stack<Double>();
-    private static Stack<Double> backupStack = new Stack<Double>(); // for implement the "undo" function
+    private static Stack<String> backupStack = new Stack<String>(); // for implement the "undo" function
     private static String input;
 
     public static String calculate(String i) {
@@ -20,9 +20,9 @@ public final class Calculator {
             if(isNumber(currentElement)){
                 //check if the item is number
                 Calculator.stack.push( Double.parseDouble(currentElement));
-                //each undo will release exactly two elements, if it was a "sqrt" or number input, then we use null to alert
-                Calculator.backupStack.push(Double.parseDouble(currentElement));
-                Calculator.backupStack.push(null);
+                //each undo will release exactly two elements, if it was a "sqrt" or number input, then we use a flag to alert
+                Calculator.backupStack.push(currentElement);
+                Calculator.backupStack.push("number");
             }
             else if (currentElement.equals("clear")){
                 //if it's a clear command
@@ -143,24 +143,24 @@ public final class Calculator {
         Double value1 = Calculator.stack.pop();
         Double value2 = Calculator.stack.pop();
         Calculator.stack.push(value2 + value1);
-        Calculator.backupStack.push(value1);
-        Calculator.backupStack.push(value2);
+        Calculator.backupStack.push(value1.toString());
+        Calculator.backupStack.push(value2.toString());
     }
 
     private static void minus(){
         Double value1 = Calculator.stack.pop();
         Double value2 = Calculator.stack.pop();
         Calculator.stack.push(value2 - value1);
-        Calculator.backupStack.push(value1);
-        Calculator.backupStack.push(value2);
+        Calculator.backupStack.push(value1.toString());
+        Calculator.backupStack.push(value2.toString());
     }
 
     private static void multiply(){
         Double value1 = Calculator.stack.pop();
         Double value2 = Calculator.stack.pop();
         Calculator.stack.push(value2 * value1);
-        Calculator.backupStack.push(value1);
-        Calculator.backupStack.push(value2);
+        Calculator.backupStack.push(value1.toString());
+        Calculator.backupStack.push(value2.toString());
     }
 
     private static void divide() throws ZeroException {
@@ -172,27 +172,34 @@ public final class Calculator {
             throw new ZeroException();
         }
         Calculator.stack.push(value2 / value1);
-        Calculator.backupStack.push(value1);
-        Calculator.backupStack.push(value2);
+        Calculator.backupStack.push(value1.toString());
+        Calculator.backupStack.push(value2.toString());
     }
 
     private static void sqrt(){
         Double value1 = Calculator.stack.pop();
         Calculator.stack.push(Math.sqrt(value1));
-        Calculator.backupStack.push(value1);
-        Calculator.backupStack.push(null);
+        Calculator.backupStack.push(value1.toString());
+        Calculator.backupStack.push("sqrt");
     }
 
     private static void undo(){
-        //each undo will release exactly two elements, if it was a "sqrt" or number input, then we use null to alert
+        //each undo will release exactly two elements, if it was a "sqrt" or number input, then we use a flag to alert
         if(Calculator.backupStack.size()>0){
             Calculator.stack.pop();
-            Double value1 = Calculator.backupStack.pop();
-            Double value2 = Calculator.backupStack.pop();
-            if(value1 != null){
-                Calculator.stack.push(value1);
+            String value1 = Calculator.backupStack.pop();
+            if (value1.equals("sqrt")){
+                //undo sqrt
+                Double value2 = Double.parseDouble(Calculator.backupStack.pop());
+                Calculator.stack.push(value2);
             }
-            if(value2 != null){
+            else if (value1.equals("number")){
+                //undo number
+                Calculator.backupStack.pop();
+            }
+            else{
+                Double value2 = Double.parseDouble(Calculator.backupStack.pop());
+                Calculator.stack.push( Double.parseDouble(value1));
                 Calculator.stack.push(value2);
             }
         }
