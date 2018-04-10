@@ -55,6 +55,38 @@ public final class Calculator {
                     break;
                 }
             }
+            else if (currentElement.equals("*")){
+                //if it's a "*"
+                try{
+                    if(Calculator.stack.size()>=2){
+                        //check if there's sufficient number for the operator
+                        multiply();
+                    }
+                    else{
+                        throw new insufficientNumberException();
+                    }
+                }
+                catch (insufficientNumberException ex){
+                    result.append("operator * (position:"+ index + " ): insufficient parameters \n");
+                    break;
+                }
+            }
+            else if (currentElement.equals("/")){
+                //if it's a "/"
+                try{
+                    if(Calculator.stack.size()>=2){
+                        //check if there's sufficient number for the operator
+                        divide();
+                    }
+                    else{
+                        throw new insufficientNumberException();
+                    }
+                }
+                catch (insufficientNumberException ex){
+                    result.append("operator / (position:"+ index + " ): insufficient parameters \n");
+                    break;
+                }
+            }
             else{
                 //other unknow char
                 for(int m=0;m<index-1;m++){
@@ -87,6 +119,18 @@ public final class Calculator {
         Double value1 = Calculator.stack.pop();
         Double value2 = Calculator.stack.pop();
         Calculator.stack.push(value2 - value1);
+    }
+
+    private static void multiply(){
+        Double value1 = Calculator.stack.pop();
+        Double value2 = Calculator.stack.pop();
+        Calculator.stack.push(value2 * value1);
+    }
+
+    private static void divide(){
+        Double value1 = Calculator.stack.pop();
+        Double value2 = Calculator.stack.pop();
+        Calculator.stack.push(value2 / value1);
     }
 
 
