@@ -4,15 +4,14 @@ public class Main {
 
 
     public static void main(String[] args) {
-        String result="test result";
+        String result;
         while(true){
             String str = readDataFromConsole("Please enter your command(type \"end\" to exit):");
             if(str.equals("end")){
                 break;
             }
             result =  Calculator.calculate(str);
-            System.out.println("The information from console:" + str);
-            System.out.println(result);
+            System.out.println("Stack:" + result);
         }
         System.out.println("bye...");
     }
