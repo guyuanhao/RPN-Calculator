@@ -10,7 +10,7 @@ public class Main {
             if(str.equals("end")){
                 break;
             }
-            result =  Calculator.setInput(str);
+            result =  Calculator.calculate(str);
             System.out.println("The information from console:" + str);
             System.out.println(result);
         }
