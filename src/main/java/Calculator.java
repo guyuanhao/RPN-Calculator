@@ -28,6 +28,7 @@ public final class Calculator {
                 //if it's a clear command
                 Calculator.stack.clear();
                 Calculator.backupStack.clear();
+                index=0;
             }
             else if (currentElement.equals("+")){
                 //if it's a "+"
@@ -41,7 +42,7 @@ public final class Calculator {
                     }
                 }
                 catch (InsufficientNumberException ex){
-                    result.append("operator + (position:"+ index + " ): insufficient parameters \n");
+                    result.append("operator + ( position:"+ index + " ): insufficient parameters \n");
                     break;
                 }
             }
@@ -135,7 +136,7 @@ public final class Calculator {
     }
 
     private static boolean isNumber(String str){
-        Pattern pattern = Pattern.compile("-?[0-9]+.*[0-9]*");
+        Pattern pattern = Pattern.compile("^(\\-|\\+)?\\d+(\\.\\d+)?$");
         return pattern.matcher(str).matches();
     }
 
