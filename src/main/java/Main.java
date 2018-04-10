@@ -6,8 +6,8 @@ public class Main {
     public static void main(String[] args) {
         String result;
         while(true){
-            String str = readDataFromConsole("Please enter your command(type \"end\" to exit):");
-            if(str.equals("end")){
+            String str = readDataFromConsole("Please enter your command(type \"exit\" to exit):");
+            if(str.equals("exit")){
                 break;
             }
             result =  Calculator.calculate(str);

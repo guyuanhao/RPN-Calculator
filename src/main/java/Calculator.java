@@ -1,4 +1,5 @@
-import exception.insufficientNumberException;
+import exception.InsufficientNumberException;
+import exception.ZeroException;
 
 import java.util.Stack;
 import java.util.regex.Pattern;
@@ -6,6 +7,7 @@ import java.util.regex.Pattern;
 public final class Calculator {
 
     private static Stack<Double> stack = new Stack<Double>();
+    private static Stack<Double> backupStack = new Stack<Double>(); // for implement the "undo" function
     private static String input;
 
     public static String calculate(String i) {
@@ -17,11 +19,15 @@ public final class Calculator {
             index++;
             if(isNumber(currentElement)){
                 //check if the item is number
-                stack.push( Double.parseDouble(currentElement));
+                Calculator.stack.push( Double.parseDouble(currentElement));
+                //each undo will release exactly two elements, if it was a "sqrt" or number input, then we use null to alert
+                Calculator.backupStack.push(Double.parseDouble(currentElement));
+                Calculator.backupStack.push(null);
             }
             else if (currentElement.equals("clear")){
                 //if it's a clear command
                 Calculator.stack.clear();
+                Calculator.backupStack.clear();
             }
             else if (currentElement.equals("+")){
                 //if it's a "+"
@@ -31,10 +37,10 @@ public final class Calculator {
                         add();
                     }
                     else{
-                        throw new insufficientNumberException();
+                        throw new InsufficientNumberException();
                     }
                 }
-                catch (insufficientNumberException ex){
+                catch (InsufficientNumberException ex){
                     result.append("operator + (position:"+ index + " ): insufficient parameters \n");
                     break;
                 }
@@ -47,10 +53,10 @@ public final class Calculator {
                         minus();
                     }
                     else{
-                        throw new insufficientNumberException();
+                        throw new InsufficientNumberException();
                     }
                 }
-                catch (insufficientNumberException ex){
+                catch (InsufficientNumberException ex){
                     result.append("operator - (position:"+ index + " ): insufficient parameters \n");
                     break;
                 }
@@ -63,10 +69,10 @@ public final class Calculator {
                         multiply();
                     }
                     else{
-                        throw new insufficientNumberException();
+                        throw new InsufficientNumberException();
                     }
                 }
-                catch (insufficientNumberException ex){
+                catch (InsufficientNumberException ex){
                     result.append("operator * (position:"+ index + " ): insufficient parameters \n");
                     break;
                 }
@@ -79,11 +85,15 @@ public final class Calculator {
                         divide();
                     }
                     else{
-                        throw new insufficientNumberException();
+                        throw new InsufficientNumberException();
                     }
                 }
-                catch (insufficientNumberException ex){
+                catch (InsufficientNumberException ex){
                     result.append("operator / (position:"+ index + " ): insufficient parameters \n");
+                    break;
+                }
+                catch (ZeroException ex){
+                    result.append("operator / (position:"+ index + " ): A number cannot be divided by zero \n");
                     break;
                 }
             }
@@ -95,13 +105,17 @@ public final class Calculator {
                         sqrt();
                     }
                     else{
-                        throw new insufficientNumberException();
+                        throw new InsufficientNumberException();
                     }
                 }
-                catch (insufficientNumberException ex){
+                catch (InsufficientNumberException ex){
                     result.append("operator sqrt (position:"+ index + " ): insufficient parameters \n");
                     break;
                 }
+            }
+            else if (currentElement.equals("undo")){
+                //if it's a "undo"
+                undo();
             }
             else{
                 //other unknow char
@@ -129,29 +143,59 @@ public final class Calculator {
         Double value1 = Calculator.stack.pop();
         Double value2 = Calculator.stack.pop();
         Calculator.stack.push(value2 + value1);
+        Calculator.backupStack.push(value1);
+        Calculator.backupStack.push(value2);
     }
 
     private static void minus(){
         Double value1 = Calculator.stack.pop();
         Double value2 = Calculator.stack.pop();
         Calculator.stack.push(value2 - value1);
+        Calculator.backupStack.push(value1);
+        Calculator.backupStack.push(value2);
     }
 
     private static void multiply(){
         Double value1 = Calculator.stack.pop();
         Double value2 = Calculator.stack.pop();
         Calculator.stack.push(value2 * value1);
+        Calculator.backupStack.push(value1);
+        Calculator.backupStack.push(value2);
     }
 
-    private static void divide(){
+    private static void divide() throws ZeroException {
         Double value1 = Calculator.stack.pop();
         Double value2 = Calculator.stack.pop();
+        if(value1 == 0){
+            Calculator.stack.push(value2);
+            Calculator.stack.push(value1);
+            throw new ZeroException();
+        }
         Calculator.stack.push(value2 / value1);
+        Calculator.backupStack.push(value1);
+        Calculator.backupStack.push(value2);
     }
 
     private static void sqrt(){
         Double value1 = Calculator.stack.pop();
         Calculator.stack.push(Math.sqrt(value1));
+        Calculator.backupStack.push(value1);
+        Calculator.backupStack.push(null);
+    }
+
+    private static void undo(){
+        //each undo will release exactly two elements, if it was a "sqrt" or number input, then we use null to alert
+        if(Calculator.backupStack.size()>0){
+            Calculator.stack.pop();
+            Double value1 = Calculator.backupStack.pop();
+            Double value2 = Calculator.backupStack.pop();
+            if(value1 != null){
+                Calculator.stack.push(value1);
+            }
+            if(value2 != null){
+                Calculator.stack.push(value2);
+            }
+        }
     }
 
 
